@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -131,4 +132,30 @@ func MoveFile(src, dst string) error {
 	}
 
 	return nil
+}
+
+// WalkFile walks up the directory tree from the current directory to find the given file.
+// It returns the full path to the file if it is found, otherwise it returns an empty string.
+//
+// Arguments:
+//   - filename: the name of the file to search for
+//   - levels: the number of levels to walk up the directory tree
+//
+// Returns:
+//   - the full path to the file if it is found, otherwise an empty string
+func WalkFile(filename string, levels int) string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+
+	for i := 0; i < levels; i++ {
+		path := filepath.Join(dir, filename)
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+		dir = filepath.Dir(dir)
+	}
+
+	return ""
 }
